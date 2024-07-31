@@ -1,6 +1,6 @@
 <?php
-define('GLPI_ROOT', '../../..');
-include(GLPI_ROOT . "/inc/includes.php");
+
+include("../../../inc/includes.php");
 
 Session::checkLoginUser();
 
@@ -12,9 +12,13 @@ $modo = $_POST['modo'];
 
 function project($project_id)
 {
-    $url = "https://forge.sirailgroup.com/api/v4/projects/$project_id";
+
+
+    $varIni = parse_ini_file(GLPI_ROOT."/plugins/gitlabintegration/gitlabintegration.ini");
+
+    $url = $varIni["GITLAB_URL"]."/api//v4/projects/".$project_id;
     $headers = array(
-        "PRIVATE-TOKEN: f2oXXH_jT-Pzy4gUzEHs"
+        "PRIVATE-TOKEN: ".$varIni["GITLAB_TOKEN"]
     );
 
     $curl = curl_init();
@@ -31,7 +35,6 @@ function project($project_id)
 if ($modo == 1) {
 
     $result = $DB->request('glpi_plugin_gitlab_projects', ['OR' => ['project_id' => $project_id, 'category_id' => $category_id]]);
-    var_dump($result->next());
     if ($result->count() > 0) {
         Session::addMessageAfterRedirect(__("The selected Project or Category is already associated", 'gitlabintegration'));
     } else {

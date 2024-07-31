@@ -44,7 +44,7 @@ class PluginGitlabIntegrationGitlabIntegration
     {
         $parameters = PluginGitlabIntegrationParameters::getParameters();
 
-        $url = "$parameters[url]api/v4/projects/$selectedProject/issues";
+        $url = "$parameters[url]/api/v4/projects/$selectedProject/issues";
 
         $headers = array(
             "PRIVATE-TOKEN: $parameters[token]"
@@ -61,7 +61,7 @@ class PluginGitlabIntegrationGitlabIntegration
             'issue_type'  => $type,
             'labels'      => $label,
         );
-
+ 
         // create an issue
         self::apiPost($query, $url, $headers);
 
@@ -72,6 +72,7 @@ class PluginGitlabIntegrationGitlabIntegration
     static public function apiPost($query, $url, $headers)
     {
         try {
+
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_POST, 1);
@@ -83,10 +84,10 @@ class PluginGitlabIntegrationGitlabIntegration
             curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
 
             curl_exec($curl);
-
+    
             curl_close($curl);
         } catch (Exception $e) {
-            PluginGitlabIntegrationParameters::ErrorLog($e->getMessage());
+            PluginGitlabIntegrationEventLog::ErrorLog($e->getMessage());
         }
     }
 
@@ -155,9 +156,9 @@ class PluginGitlabIntegrationGitlabIntegration
      *
      * @return $iid
      */
-    static private function getIidIssue($selectedProject, $parameters, $headers)
+    static public function getIidIssue($selectedProject, $parameters, $headers)
     {
-        $url = "$parameters[url]api/v4/projects/$selectedProject/issues";
+        $url = "$parameters[url]/api/v4/projects/$selectedProject/issues";
 
         try {
             $result = self::apiGet($url, $headers);
@@ -168,7 +169,7 @@ class PluginGitlabIntegrationGitlabIntegration
                 $iid = 1;
             }
         } catch (Exception $e) {
-            PluginGitlabIntegrationParameters::ErrorLog($e->getMessage());
+            PluginGitlabIntegrationEventLog::ErrorLog($e->getMessage());
         }
 
         return $iid;

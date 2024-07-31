@@ -1,9 +1,8 @@
 <?php
-define('GLPI_ROOT', '../../..');
-include(GLPI_ROOT . "/inc/includes.php");
+include( "../../../inc/includes.php");
 
-// $criteria = $_GET['criteria'];
-$start = $_GET['start'];
+$criteria = (isset($_GET['criteria'])) ? $_GET['criteria'] : '';
+$start = (isset($_GET['start'])) ? $_GET['start'] : 0;
 
 Session::checkLoginUser();
 
@@ -15,7 +14,8 @@ Html::header(
     "profiles"
 );
 PluginGitlabIntegrationProfiles::title();
-// Search::show('PluginGitlabIntegrationProfiles');
+PluginGitlabIntegrationProfiles::forceTable("glpi_plugin_gitlab_profiles_users");
+Search::show('PluginGitlabIntegrationProfiles');
 PluginGitlabIntegrationProfiles::configPage($start);
 PluginGitlabIntegrationProfiles::massiveActions($start);
 PluginGitlabIntegrationProfiles::configPage($start);

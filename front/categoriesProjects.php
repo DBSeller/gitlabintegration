@@ -1,9 +1,10 @@
 <?php
-define('GLPI_ROOT', '../../..');
-include(GLPI_ROOT . "/inc/includes.php");
+include( "../../../inc/includes.php");
+
+$criteria = (isset($_GET['criteria'])) ? $_GET['criteria'] : '';
+$start = (isset($_GET['start'])) ? $_GET['start'] : 0;
 
 // $criteria = $_GET['criteria'];
-$start = $_GET['start'];
 
 Session::checkLoginUser();
 

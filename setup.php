@@ -41,17 +41,17 @@ function plugin_version_gitlabintegration()
 		'author'		  => 'Zohair LAABANE TLEMCANI',
 		'license'		  => 'GPLv3+',
 		'homepage'		  => '',
-		'minGlpiVersion' => '9.4'
+		'minGlpiVersion' => '10'
 	);
 }
 
 
 function plugin_gitlabintegration_check_prerequisites()
 {
-	if (GLPI_VERSION >= 9.4) {
+	if (GLPI_VERSION >= 10) {
 		return true;
 	} else {
-		echo "GLPI version NOT compatible. Requires GLPI >= 9.4";
+		echo "GLPI version NOT compatible. Requires GLPI >= 10";
 	}
 }
 

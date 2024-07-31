@@ -1,9 +1,8 @@
 <?php
-define('GLPI_ROOT', '../../..');
-include(GLPI_ROOT . "/inc/includes.php");
+include("../../../inc/includes.php");
 
 // $criteria = $_GET['criteria'];
-$start = $_GET['start'];
+$start = (isset($_GET['start'])) ? $_GET['start'] : 0;
 
 Session::checkLoginUser();
 
@@ -15,6 +14,7 @@ Html::header(
     "defaultProject"
 );
 PluginGitlabIntegrationDefaultProject::title();
+PluginGitlabIntegrationDefaultProject::forceTable("glpi_plugin_gitlab_projects");
 // Search::show('PluginGitlabIntegrationDefaultProject');
 PluginGitlabIntegrationDefaultProject::configPage($start);
 PluginGitlabIntegrationDefaultProject::massiveActions($start);
@@ -22,4 +22,4 @@ PluginGitlabIntegrationDefaultProject::configPage($start);
 
 Html::footer();
 
-PluginGitlabIntegrationDefaultProject::dialogActions();
+//PluginGitlabIntegrationDefaultProject::dialogActions();

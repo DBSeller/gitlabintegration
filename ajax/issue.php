@@ -1,11 +1,10 @@
 <?php
-define('GLPI_ROOT', '../../..');
-include(GLPI_ROOT . "/inc/includes.php");
+include("../../../inc/includes.php");
 
 Session::checkLoginUser();
 
 $selectedProject = (int)$_POST['selectedProject'];
-$selectedCategory = (int)$_POST['selectedCategory'];
+//$selectedCategory = (int)$_POST['selectedCategory'];
 $ticketId = (int)$_POST['ticketId'];
 $ticketName = $_POST['ticketName'];
 $ticketContent = $_POST['ticketContent'];
@@ -13,21 +12,29 @@ $ticketDueDate = $_POST['ticketDueDate'];
 $ticketType = $_POST['ticketType'];
 $ticketLabel = $_POST['ticketLabel'];
 
-$result = $DB->request('glpi_plugin_gitlab_integration', ['ticket_id' => $ticketId, 'gitlab_project_id' => $selectedProject]);
-$findCategoryProject = $DB->request('glpi_plugin_gitlab_projects', ['category_id' => $selectedCategory]);
+$result = $DB->request('glpi_plugin_gitlab_integration', [
+    'ticket_id' => $ticketId, 
+    'gitlab_project_id' => $selectedProject
+]);
+
+//$findCategoryProject = $DB->request('glpi_plugin_gitlab_projects', ['category_id' => $selectedCategory]);
+
+
 
 if ($result->count() > 0) {
+    
     $response = ['res' => false];
     echo json_encode($response);
 } else {
     if (class_exists('PluginGitlabIntegrationParameters')) {
-        $DB->insert(
-            'glpi_plugin_gitlab_integration',
-            [
-                'ticket_id'         => $ticketId,
-                'gitlab_project_id' => $selectedProject
-            ]
-        );
+
+        //$DB->insert(
+        //    'glpi_plugin_gitlab_integration',
+        //    [
+        //        'ticket_id'         => $ticketId,
+        //        'gitlab_project_id' => $selectedProject
+        //    ]
+        //);
 
         $title = $ticketId . ' - ' . $ticketName;
         $description = str_replace('&lt;p&gt;', '', str_replace('&lt;/p&gt;', '', $ticketContent));
@@ -38,7 +45,7 @@ if ($result->count() > 0) {
         $dueDate = $ticketDueDate;
         $type = $ticketType;
         $label = $ticketLabel;
-        $assignedTo = $ticketAssignedTo;
+        //$assignedTo = $ticketAssignedTo;
 
         PluginGitlabIntegrationGitlabIntegration::CreateIssue($selectedProject, $title, $description, $dueDate, $type, $label);
 
@@ -49,4 +56,6 @@ if ($result->count() > 0) {
         $response = ['res' => true];
         echo json_encode($response);
     }
+
+   
 }

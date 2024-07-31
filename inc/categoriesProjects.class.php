@@ -26,8 +26,8 @@ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------
  */
 
-define('PLUGIN_ROOT', '../../..');
 
+ 
 /**
  * Summary of PluginGitlabIntegrationCategoriesProjects
  * */
@@ -135,9 +135,11 @@ class PluginGitlabIntegrationCategoriesProjects extends CommonDBTM
      */
     public static function projects()
     {
-        $url = "https://forge.sirailgroup.com/api/v4/projects";
+        $varIni = parse_ini_file(GLPI_ROOT."/plugins/gitlabintegration/gitlabintegration.ini");
+
+        $url = $varIni["GITLAB_URL"]."/api/v4/projects";
         $headers = array(
-            "PRIVATE-TOKEN: gitlab token"
+            "PRIVATE-TOKEN: ".$varIni["GITLAB_TOKEN"]
         );
 
         $curl = curl_init();
@@ -174,7 +176,7 @@ class PluginGitlabIntegrationCategoriesProjects extends CommonDBTM
      *
      * @return void
      */
-    public static function showForm()
+    public  function showForm($ID, $options= [])
     {
         $projects = self::projects();
 

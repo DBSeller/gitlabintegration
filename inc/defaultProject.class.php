@@ -26,8 +26,6 @@ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------
  */
 
-define('PLUGIN_ROOT', '../../..');
-
 /**
  * Summary of PluginGitlabIntegrationProfiles
  * */
@@ -137,7 +135,7 @@ class PluginGitlabIntegrationDefaultProject extends CommonDBTM
      *
      * @return void
      */
-    public static function showForm()
+    public function showForm($ID, array $options = [])
     {
         $projects = PluginGitlabIntegrationCategoriesProjects::projects();
         echo '<div class="glpi_tabs new_form_tabs">';

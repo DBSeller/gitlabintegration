@@ -26,8 +26,7 @@ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------
  */
 
-define('PLUGIN_ROOT', '../../..');
-
+ 
 /**
  * Summary of PluginGitlabIntegrationProfiles
  * */
@@ -35,7 +34,8 @@ define('PLUGIN_ROOT', '../../..');
 class PluginGitlabIntegrationProfiles extends CommonDBTM
 {
    static $rightname = 'profiles';
-
+   
+   
    /**
     * Display contents the create of profiles Permission.
     *
@@ -137,7 +137,7 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
     *
     * @return void
     */
-   public static function showForm()
+   public  function showForm($ID, array $options = [])
    {
       echo '<div class="glpi_tabs new_form_tabs">';
       echo '   <div id="tabspanel" class="center-h">';
@@ -222,7 +222,7 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
       $tab[] = [
          'id'            => 1,
          'table'         => self::getTable(),
-         'field'         => 'profile',
+         'field'         => 'profile_id',
          'name'          => __("Profile", "gitlabintegration"),
          'massiveaction' => false,
       ];
@@ -230,7 +230,7 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
       $tab[] = [
          'id'            => 2,
          'table'         => self::getTable(),
-         'field'         => 'user',
+         'field'         => 'user_id',
          'name'          => __("Created By", "gitlabintegration"),
          'massiveaction' => false,
       ];

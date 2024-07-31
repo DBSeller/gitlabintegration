@@ -73,9 +73,9 @@ function plugin_gitlabintegration_create_integration($DB)
 				   `id` INT(11) NOT NULL AUTO_INCREMENT,
 				   `ticket_id` INT(11) NOT NULL,
 				   `gitlab_project_id` INT(11) NOT NULL,
-				   `gitlab_member_id` INT (11) NOT NULL,
+				   `gitlab_member_id` INT (11),
 				   PRIMARY KEY  (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 		$DB->queryOrDie($query, $DB->error());
 
 		$query = "ALTER TABLE `glpi_plugin_gitlab_integration`
@@ -94,7 +94,7 @@ function plugin_gitlabintegration_create_profiles($DB)
 				   `user_id` INT(11) NOT NULL,
 				   `created_at` DATETIME,
 				   PRIMARY KEY (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 		$DB->queryOrDie($query, $DB->error());
 
 		$query = "ALTER TABLE `glpi_plugin_gitlab_profiles_users`
@@ -120,7 +120,7 @@ function plugin_gitlabintegration_create_projects($DB)
 				   `general` BOOLEAN NOT NULL DEFAULT 0,
 				   `created_at` DATETIME,
 				   PRIMARY KEY (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 		$DB->queryOrDie($query, $DB->error());
 
 		$query = "ALTER TABLE `glpi_plugin_gitlab_projects`
@@ -138,7 +138,7 @@ function plugin_gitlabintegration_create_parameters($DB)
 				   `name` VARCHAR(50) NOT NULL,
 				   `value` VARCHAR(125),
 				   PRIMARY KEY  (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 		$DB->queryOrDie($query, $DB->error());
 
 		$query = "ALTER TABLE `glpi_plugin_gitlab_parameters`
