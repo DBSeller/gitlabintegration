@@ -140,7 +140,7 @@ class PluginGitlabIntegrationGitlabIntegration
     {
         $parameters = PluginGitlabIntegrationParameters::getParameters();
 
-        $url = "$parameters[url]api/v4/projects/$project/members";
+        $url = "$parameters[url]/api/v4/projects/$project/members";
 
         $headers = array(
             "PRIVATE-TOKEN: $parameters[token]"

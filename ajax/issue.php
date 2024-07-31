@@ -28,13 +28,13 @@ if ($result->count() > 0) {
 } else {
     if (class_exists('PluginGitlabIntegrationParameters')) {
 
-        //$DB->insert(
-        //    'glpi_plugin_gitlab_integration',
-        //    [
-        //        'ticket_id'         => $ticketId,
-        //        'gitlab_project_id' => $selectedProject
-        //    ]
-        //);
+        $DB->insert(
+            'glpi_plugin_gitlab_integration',
+            [
+                'ticket_id'         => $ticketId,
+                'gitlab_project_id' => $selectedProject
+            ]
+        );
 
         $title = $ticketId . ' - ' . $ticketName;
         $description = str_replace('&lt;p&gt;', '', str_replace('&lt;/p&gt;', '', $ticketContent));
@@ -45,7 +45,7 @@ if ($result->count() > 0) {
         $dueDate = $ticketDueDate;
         $type = $ticketType;
         $label = $ticketLabel;
-        //$assignedTo = $ticketAssignedTo;
+        $assignedTo = $ticketAssignedTo;
 
         PluginGitlabIntegrationGitlabIntegration::CreateIssue($selectedProject, $title, $description, $dueDate, $type, $label);
 
