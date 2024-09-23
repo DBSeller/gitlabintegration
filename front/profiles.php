@@ -14,12 +14,13 @@ Html::header(
     "profiles"
 );
 PluginGitlabIntegrationProfiles::title();
-PluginGitlabIntegrationProfiles::forceTable("glpi_plugin_gitlab_profiles_users");
-Search::show('PluginGitlabIntegrationProfiles');
-PluginGitlabIntegrationProfiles::configPage($start);
+// PluginGitlabIntegrationProfiles::forceTable("glpi_plugin_gitlab_profiles_users");
+// Search::show('PluginGitlabIntegrationProfiles');
+// PluginGitlabIntegrationProfiles::configPage($start);
+// PluginGitlabIntegrationProfiles::dialogActions();
 PluginGitlabIntegrationProfiles::massiveActions($start);
 PluginGitlabIntegrationProfiles::configPage($start);
 
 Html::footer();
 
-PluginGitlabIntegrationProfiles::dialogActions();
+

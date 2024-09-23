@@ -20,6 +20,10 @@ const associate = () => {
     });
 };
 
+
+
+
+
 const createIssue = (
   ticketId,
   ticketName,
@@ -184,14 +188,24 @@ const addProfile = (dropdown, userId) => {
       data: {
         profileId: newProfileSelected,
         userId: userId,
-        modo: 1,
-        id: 0,
+        method: "create"
       },
     })
-    .success(function () {
-      window.open("../front/profiles.php", "_self");
+    .success(function (resp) {
+      
+      alert(resp.message);
+      
+      if(!resp.success){
+        return;
+      }
+  
+      setTimeout(()=>{
+        window.open("../front/profiles.php", "_self");
+        },3000)
+
     })
     .fail(function () {
+        alert("Ocorreu um erro!");
       return false;
     });
 };
@@ -200,7 +214,7 @@ const setClickCheckAll = (checkboxName, principal) => {
   checkboxName = "checkAll_" + checkboxName;
   let checkbox = document.getElementsByName(checkboxName);
   checkbox[0].addEventListener(
-    "click",
+    "change",
     function () {
       if (principal) {
         checkAllBoxes(checkboxName, checkbox[0].checked);
@@ -265,7 +279,7 @@ const changeCheckInput = (inputArray, checked) => {
 const openActions = () => {
   countCheckSelected();
   let div = document.getElementById("favDialog");
-  $(div).dialog();
+  // $(div).dialog();
 };
 
 const countCheckSelected = () => {
@@ -294,53 +308,6 @@ const countCheckSelected = () => {
   }
 };
 
-const removePermission = (dropdown) => {
-  let dropdownActions = document.getElementById("dropdown_actions" + dropdown);
-  let selectedAction =
-    dropdownActions.options[dropdownActions.selectedIndex].value;
-
-  if (selectedAction == 0) {
-    let div = document.getElementById("favDialog");
-    $(div).dialog("close");
-  } else {
-    let inputsData = document
-      .getElementById("data")
-      .getElementsByTagName("input");
-
-    let countSelected = 0;
-    let idProfilesSelected = [];
-    for (i = 0; i < inputsData.length; i++) {
-      if (inputsData[i].type == "checkbox") {
-        if (inputsData[i].checked) {
-          profile = inputsData[i].name.split("_");
-          idProfilesSelected[countSelected] = profile[2];
-          countSelected++;
-        }
-      }
-    }
-
-    idProfilesSelected.forEach((element) => {
-      jQuery
-        .ajax({
-          type: "POST",
-          url: "../ajax/profile.php",
-          data: {
-            profileId: 0,
-            userId: 0,
-            modo: 0,
-            id: element,
-          },
-        })
-        .success(function () {
-          window.open("../front/profiles.php", "_self");
-        })
-        .fail(function () {
-          return false;
-        });
-    });
-  }
-};
-
 const removeAssociation = (projectId, categoryId) => {
   jQuery
     .ajax({
@@ -355,3 +322,75 @@ const removeAssociation = (projectId, categoryId) => {
     .success(() => location.reload())
     .fail(() => false);
 };
+
+
+window.onload = function(){
+
+
+  function idsChecked(){
+    let ids = []
+    checksGitLab.forEach(e =>{
+         if(e.checked){
+            ids.push(e.getAttribute("data-id"));
+         }
+        
+    })
+    return ids;
+  }
+
+  const btnExcluirProfile =   document.getElementById("btn_excluir_profile");
+
+  if(btnExcluirProfile){
+      btnExcluirProfile.addEventListener("click",()=>{
+        let idsCheckedValues =  idsChecked();
+        if(!idsCheckedValues.length){
+            alert("Para excluir selecione um profile");
+            return;
+        }
+  
+        jQuery
+        .ajax({
+          type: "POST",
+          url: "../ajax/profile.php",
+          data: {
+            method: "delete",
+            ids: idsCheckedValues,
+          },
+        })
+        .success(function (resp) {
+            alert(resp.message);
+  
+            if(resp.success){
+            setTimeout(()=>{
+              window.open("../front/profiles.php", "_self");
+              },3000)
+            }
+        
+        })
+        .fail(function () {
+          return false;
+        });
+  
+    });
+ 
+  }
+
+
+  const checksGitLab = document.querySelectorAll(".gitlab_profile_check");
+  const checkAllGitLab = document.querySelector("input[name=gitlab_profile_check_all]");
+
+  if(checkAllGitLab){
+    checkAllGitLab.addEventListener("change",(checkAll) =>{
+      checksGitLab.forEach(e => {
+             e.checked =  checkAll.target.checked;
+      });
+  
+    });
+  }
+
+
+
+  
+ 
+}
+

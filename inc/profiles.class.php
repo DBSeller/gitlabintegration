@@ -36,6 +36,7 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
    static $rightname = 'profiles';
    
    
+   
    /**
     * Display contents the create of profiles Permission.
     *
@@ -62,11 +63,8 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
       echo "<tr>";
       echo "<td width='45px'>";
       echo "<a href='https://forge.sirailgoup.com' target='_blank'>";
-      echo "<img class='logo' src='" . PLUGIN_ROOT . "/plugins/gitlabintegration/img/just-logo.png' height='35px' alt='Gitlab Forge' title='Gitlab Forge'>";
+      echo "<img class='logo' src='/plugins/gitlabintegration/img/just-logo.png' height='35px' alt='Gitlab Forge' title='Gitlab Forge'>";
       echo "</a>";
-      echo "</td>";
-      echo "<td>";
-      echo "<a class='vsubmit' href='https://forge.sirailgoup.com' target='_blank'>Gitlab Forge</a>";
       echo "</td>";
       echo "</tr>";
       echo "</tbody></table>";
@@ -182,30 +180,7 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
     */
    static function massiveActions($start)
    {
-      self::headMassiveActions(true);
-
       self::tableMassiveActions($start);
-
-      self::headMassiveActions(false);
-   }
-
-   static function dialogActions()
-   {
-      echo '<div id="favDialog" role="dialog" title="' . __('Actions', 'gitlabintegration') . '" style="width: 40% !important; height: 30% !important">';
-      echo '   <div>';
-      echo '      <div id="no_information" class="body-dialog">';
-      echo '         <img src="/pics/warning.png" alt="Warning"><br><br>';
-      echo '         <span class="b">' . __('No selected items', 'gitlabintegration') . '</span><br>';
-      echo '      </div>';
-      echo '      <div id="options_to_select" class="body-dialog">';
-      echo '         <div class="inline" style="margin-right:10px">' . __('Actions', 'gitlabintegration') . ': </div>';
-      $dropdown = self::dropdownActions(['value' => 'actions']);
-      echo '      </div>';
-      echo '      <div id="button_confirm_action" style="margin:15px" class="body-dialog">';
-      echo '         <div class="primary-button" onClick="removePermission(' . $dropdown . ')">Post</div>';
-      echo '      </div>';
-      echo '   </div>';
-      echo '</div>';
    }
 
    /**
@@ -219,54 +194,8 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
    {
       $tab = [];
 
-      $tab[] = [
-         'id'            => 1,
-         'table'         => self::getTable(),
-         'field'         => 'profile_id',
-         'name'          => __("Profile", "gitlabintegration"),
-         'massiveaction' => false,
-      ];
-
-      $tab[] = [
-         'id'            => 2,
-         'table'         => self::getTable(),
-         'field'         => 'user_id',
-         'name'          => __("Created By", "gitlabintegration"),
-         'massiveaction' => false,
-      ];
-
       return $tab;
    }
-
-   /**
-    * Display contents the principal head of profiles Permission.
-    *
-    * @param void
-    *
-    * @return void
-    */
-   private static function headMassiveActions($top = true)
-   {
-      echo '<form name = "massformUser" method="post" action="/front/massiveaction.php">';
-      echo '<table class="tab_glpi" width="95%">';
-      echo '<tbody>';
-      echo '<tr>';
-      echo '<td width="30px">';
-      if ($top) {
-         echo '<img src="/pics/arrow-left-top.png" alt="">';
-      } else {
-         echo '<img src="/pics/arrow-left.png" alt="">';
-      }
-      echo '</td>';
-      echo '<td width="100%" class="left">';
-      echo '<div class="primary-button" title="' . __('Actions', 'gitlabintegration') . '" onClick="openActions()">' . __('Actions', 'gitlabintegration') . '</div>';
-      echo '</td>';
-      echo '</tr>';
-      echo '</tbody>';
-      echo '</table>';
-      echo '</form>';
-   }
-
    /**
     * Display contents the principal table of profiles Permission.
     *
@@ -276,11 +205,11 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
     */
    private static function tableMassiveActions($start)
    {
-      echo '<div class="center">';
-      echo '<table border="0" class="tab_cadrehov">';
+      echo '<div class="left">';
+      echo "<button id='btn_excluir_profile' class='vsubmit' style='margin-left:50px;'>Excluir</button>";
+      echo '<table border="0" class="tab_cadrehov" id="gitlab_profile_table">';
       self::titleTable(1);
       self::bodyTable($start);
-      self::titleTable(2);
       echo '</table>';
       echo '</div>';
    }
@@ -298,20 +227,16 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
       echo '<tbody id="principal_' . $id . '">';
       echo '<tr class="tab_bg_2">';
       echo '<th class="left">';
-
-      $checkboxName = mt_rand();
-      Html::showCheckbox(['name' => 'checkAll_' . $checkboxName, 'checked' => false]);
-
-      echo '<script type="text/javascript">';
-      echo 'setClickCheckAll("' . $checkboxName . '", true)';
-      echo '</script>';
-
+      echo '<input type="checkbox" class="form-check-input gitlab_profile_check" title="" id="check_238467516" name="gitlab_profile_check_all" value="false">';
       echo '</th>';
       echo '<th class="left" style="width:30%">';
       echo '<a href="#">' . __('Profile', 'gitlabintegration') . '</a>';
       echo '</th>';
       echo '<th class="left" style="width:35%">';
       echo '<a href="#">' . __('Created By', 'gitlabintegration') . '</a>';
+      echo '</th>';
+      echo '<th class="left" style="width:35%">';
+      echo '<a href="#">' . __('Created By Name', 'gitlabintegration') . '</a>';
       echo '</th>';
       echo '<th>';
       echo '<a href="#">' . __('Created At', 'gitlabintegration') . '</a>';
@@ -345,27 +270,30 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
          if ($start <= $count) {
             if ($countStart < $limit) {
                $profile = $row['profile'];
-               $user    = $row['firstname_user'] . ' ' . $row['realname_user'];
+               $user    = $row['user_id'];
+               $userName   = $row['user_name'];
                $created = $row['created_at'];
                $id      = $row['id'];
 
                echo '<tr class="tab_bg_2">';
                echo '<td width="10" valign="top">';
-
-               $checkboxName = mt_rand();
-
-               Html::showCheckbox(['name' => 'checkAll_' . $checkboxName . '_' . $id, 'checked' => false]);
-
-               echo '<script type="text/javascript">';
-               echo 'setClickCheckAll("' . $checkboxName . '_' . $id . '", false)';
-               echo '</script>';
-
+               echo '<input 
+                        type="checkbox" 
+                        class="form-check-input gitlab_profile_check" title="" 
+                        id="check_'.$id.'"
+                        name="gitlab_profile_check_'.$id.'" 
+                        value="false"
+                        data-id="'.$id.'"
+               >';
                echo '</td>';
                echo '<td valign="top">';
                echo $profile;
                echo '</td>';
                echo '<td valign="top">';
                echo $user;
+               echo '</td>';
+               echo '<td valign="top">';
+               echo $userName;
                echo '</td>';
                echo '<td valign="top">';
                echo $created;
@@ -392,11 +320,14 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
    private static function getProfilesUsers()
    {
       global $DB;
-      $result = $DB->request('SELECT `p`.`name` AS `profile`, `u`.`firstname` AS `firstname_user`, 
-                                     `u`.`realname` AS `realname_user`, `pu`.`created_at`, `pu`.`id` 
+      $result = $DB->request('SELECT `p`.`name` AS `profile`, 
+                                     `u`.`firstname` AS `user_name`, 
+                                     `pu`.`created_at`,
+                                     `pu`.`id`,
+                                     `pu`.`user_id` 
                               FROM `glpi_plugin_gitlab_profiles_users` AS `pu`
-                                    LEFT JOIN `glpi_profiles` AS `p` ON (`p`.`id` = `pu`.`profile_id`)
-                                    LEFT JOIN `glpi_users` AS `u` ON (`u`.`id` = `pu`.`user_id`)');
+                                    INNER JOIN `glpi_profiles` AS `p` ON (`p`.`id` = `pu`.`profile_id`)
+                                    INNER JOIN `glpi_users` AS `u` ON (`u`.`id` = `pu`.`user_id`)');
       return $result;
    }
 
@@ -419,32 +350,5 @@ class PluginGitlabIntegrationProfiles extends CommonDBTM
       return $amount;
    }
 
-   /**
-    * Display contents at the component of permission profiles.
-    *
-    * @param array $options
-    *
-    * @return Dropdown component
-    */
-   static function dropdownActions(array $options = [])
-   {
-      $p = [
-         'name'     => 'actions',
-         'value'    => 0,
-         'showtype' => 'normal',
-         'display'  => true,
-      ];
-
-      if (is_array($options) && count($options)) {
-         foreach ($options as $key => $val) {
-            $p[$key] = $val;
-         }
-      }
-
-      $values = [];
-      $values[0] = '----';
-      $values[1] = __('Permanently Delete', 'gitlabintegration');
-
-      return Dropdown::showFromArray($p['name'], $values, $p);
-   }
+  
 }

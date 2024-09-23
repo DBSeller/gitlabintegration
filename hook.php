@@ -69,7 +69,7 @@ function plugin_gitlabintegration_uninstall()
 function plugin_gitlabintegration_create_integration($DB)
 {
 	if (!$DB->tableExists('glpi_plugin_gitlab_integration')) {
-		$query = "CREATE TABLE `glpi_plugin_gitlab_integration` (
+		$query = "CREATE TABLE  IF NOT EXISTS  `glpi_plugin_gitlab_integration` (
 				   `id` INT(11) NOT NULL AUTO_INCREMENT,
 				   `ticket_id` INT(11) NOT NULL,
 				   `gitlab_project_id` INT(11) NOT NULL,
@@ -77,6 +77,11 @@ function plugin_gitlabintegration_create_integration($DB)
 				   PRIMARY KEY  (`id`)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 		$DB->queryOrDie($query, $DB->error());
+
+		$query = "ALTER TABLE `glpi_plugin_gitlab_integration`
+	                DROP CONSTRAINT IF EXISTS `fk_gitlab_ticket`";
+		$DB->queryOrDie($query, $DB->error());
+
 
 		$query = "ALTER TABLE `glpi_plugin_gitlab_integration`
 	                ADD CONSTRAINT `fk_gitlab_ticket`
@@ -88,7 +93,7 @@ function plugin_gitlabintegration_create_integration($DB)
 function plugin_gitlabintegration_create_profiles($DB)
 {
 	if (!$DB->tableExists('glpi_plugin_gitlab_profiles_users')) {
-		$query = "CREATE TABLE `glpi_plugin_gitlab_profiles_users` (
+		$query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_gitlab_profiles_users` (
 				   `id` INT(11) NOT NULL AUTO_INCREMENT,
 				   `profile_id` INT(11) NOT NULL,
 				   `user_id` INT(11) NOT NULL,
@@ -97,7 +102,7 @@ function plugin_gitlabintegration_create_profiles($DB)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 		$DB->queryOrDie($query, $DB->error());
 
-		$query = "ALTER TABLE `glpi_plugin_gitlab_profiles_users`
+		$query = "ALTER TABLE IF NOT EXISTS `glpi_plugin_gitlab_profiles_users`
 	                ADD CONSTRAINT `fk_gitlab_profile`
 					FOREIGN KEY (`profile_id`) REFERENCES `glpi_profiles` (`id`)";
 		$DB->queryOrDie($query, $DB->error());
@@ -112,7 +117,7 @@ function plugin_gitlabintegration_create_profiles($DB)
 function plugin_gitlabintegration_create_projects($DB)
 {
 	if (!$DB->tableExists('glpi_plugin_gitlab_projects')) {
-		$query = "CREATE TABLE `glpi_plugin_gitlab_projects` (
+		$query = "CREATE TABLE IF NOT EXISTS  `glpi_plugin_gitlab_projects` (
 				   `id` INT(11) NOT NULL AUTO_INCREMENT,
 				   `project_id` INT(11) NOT NULL,
 				   `project_name` VARCHAR(255) NOT NULL,
@@ -133,7 +138,7 @@ function plugin_gitlabintegration_create_projects($DB)
 function plugin_gitlabintegration_create_parameters($DB)
 {
 	if (!$DB->tableExists('glpi_plugin_gitlab_parameters')) {
-		$query = "CREATE TABLE `glpi_plugin_gitlab_parameters` (
+		$query = "CREATE TABLE IF NOT EXISTS  `glpi_plugin_gitlab_parameters` (
 				   `id` INT(11) NOT NULL AUTO_INCREMENT,
 				   `name` VARCHAR(50) NOT NULL,
 				   `value` VARCHAR(125),

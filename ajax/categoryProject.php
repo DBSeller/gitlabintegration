@@ -16,7 +16,7 @@ function project($project_id)
 
     $varIni = parse_ini_file(GLPI_ROOT."/plugins/gitlabintegration/gitlabintegration.ini");
 
-    $url = $varIni["GITLAB_URL"]."/api//v4/projects/".$project_id;
+    $url = $varIni["GITLAB_URL"]."/api/v4/projects/".$project_id;
     $headers = array(
         "PRIVATE-TOKEN: ".$varIni["GITLAB_TOKEN"]
     );

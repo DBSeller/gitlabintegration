@@ -62,7 +62,7 @@ class PluginGitlabIntegrationCategoriesProjects extends CommonDBTM
         echo "<tr>";
         echo "<td width='45px'>";
         echo "<a href='https://forge.sirailgoup.com' target='_blank'>";
-        echo "<img class='logo' src='" . PLUGIN_ROOT . "/plugins/gitlabintegration/img/just-logo.png' height='35px' alt='Gitlab Forge' title='Gitlab Forge'>";
+        echo "<img class='logo' src='/plugins/gitlabintegration/img/just-logo.png' height='35px' alt='Gitlab Forge' title='Gitlab Forge'>";
         echo "</a>";
         echo "</td>";
         echo "<td>";

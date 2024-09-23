@@ -1,63 +1,102 @@
 <?php
+
+use Symfony\Component\Console\Output\Output;
+
 include("../../../inc/includes.php");
+
 
 Session::checkLoginUser();
 
-// Modo: 1 = Insert 0 = Delete
-$modo = (int)$_POST['modo'];
+class GitLabProfifle{
 
-$profileId = (int)$_POST['profileId'];
-$userId = (int)$_POST['userId'];
-$id = (int)$_POST['id'];
 
-//INSERT
-if ($profileId) {
-    if ($modo == 1) {
+    private $request;
+    private $response = [
+         "success" => false,
+         "message" => ""
+    ];
+
+    public function __construct($request){
+
+        $this->request  = (object) $request;
+
+        if(empty($this->request->method)){
+             $this->response["message"] = "método obrigatório!";
+             $this->OutputResponse();
+        }
+
+        switch($this->request->method){
+            case "create":
+                $this->save($this->request->profileId);
+                $this->OutputResponse();
+            break;
+            case "delete":
+                $this->delete($this->request->ids);
+                $this->OutputResponse();
+            break;
+            default:
+                  $this->response["message"] = "método inválida!";
+                  $this->OutputResponse();
+            break;
+        }
+        
+    }
+
+    public function save($profileId){
+
+        global $DB;
+
         $result = $DB->request('glpi_plugin_gitlab_profiles_users', ['profile_id' => [$profileId]]);
         if ($result->count() > 0) {
-            $erro = "[" . $_SESSION["glpi_currenttime"] . "] glpiphplog.ERROR: PluginGitlabIntegrationProfiles::permissions() in profile.php line 10" . PHP_EOL;
-            $erro = $erro . "  ***PHP Notice: The selected profile already has permission: Profile Id: " . $profileId;
-            PluginGitlabIntegrationEventLog::ErrorLog($erro);
-
-            Session::addMessageAfterRedirect(__('The selected profile already has permission. Verify logs for more information!', 'gitlabintegration'));
+            $this->response["message"] = "O profile já tem permissão!";
         } else {
             $DB->insert(
                 'glpi_plugin_gitlab_profiles_users',
                 [
                     'profile_id' => $profileId,
-                    'user_id'    => $userId,
+                    'user_id'    => $_SESSION["glpiID"],
                     'created_at' => $_SESSION["glpi_currenttime"]
                 ]
             );
 
-            PluginGitlabIntegrationEventLog::Log($profileId, 'profiles', $_SESSION["glpi_currenttime"], 'gitlab', 4, sprintf(__('%2s granted permission for profile ' . $profileId, 'gitlabintegration'), $_SESSION["glpiname"]));
-
-            Session::addMessageAfterRedirect(__('Permission granted successfully!', 'gitlabintegration'));
+            $this->response["message"] = "Permissão concedida com sucesso!";
+            $this->response["success"] = true;
         }
+
+    }
+
+    public function delete($ids){
+
+        global $DB;
+
+
+        try{
+
+
+            foreach($ids as $id){
+                $DB->delete(
+                    'glpi_plugin_gitlab_profiles_users',
+                    [
+                        'id' => $id
+                    ]
+                );
+            }
+
+            $this->response["message"] = "Permissão excluída com sucesso!";
+            $this->response["success"] = true;
+        } catch(\Exception $ex) {
+            $this->response["message"] = "Erro ao excluir!";
+        }
+
+    }
+
+    private function OutputResponse(){
+        header("Content-type: application/json; charset=utf-8");
+        echo json_encode($this->response);
     }
 }
 
-//DELETE
-if ($id) {
-    if ($modo == 0) {
-        $result = $DB->request('glpi_plugin_gitlab_profiles_users', ['id' => [$id]]);
-        if ($result->count() > 0) {
-            $DB->delete(
-                'glpi_plugin_gitlab_profiles_users',
-                [
-                    'id' => $id
-                ]
-            );
+new GitLabProfifle($_POST);
 
-            PluginGitlabIntegrationEventLog::Log($id, 'profiles', $_SESSION["glpi_currenttime"], 'gitlab', 4, sprintf(__('%2s removed permission for id ' . $id, 'gitlabintegration'), $_SESSION["glpiname"]));
 
-            Session::addMessageAfterRedirect(__('Permission removed with successfully!', 'gitlabintegration'));
-        } else {
-            $erro = "[" . $_SESSION["glpi_currenttime"] . "] glpiphplog.ERROR: PluginGitlabIntegrationProfiles::permissions() in profile.php line 10" . PHP_EOL;
-            $erro = $erro . "  ***PHP Notice: The selected profile can't be deleted: Id: " . $id;
-            PluginGitlabIntegrationEventLog::ErrorLog($erro);
 
-            Session::addMessageAfterRedirect(__('The selected profile can not be deleted. Verify logs for more information!'));
-        }
-    }
-}

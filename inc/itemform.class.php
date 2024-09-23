@@ -59,14 +59,18 @@ class PluginGitlabIntegrationItemForm
          $projects = PluginGitlabIntegrationCategoriesProjects::projects();
          $firstElt = ($item::getType() == Ticket::getType() ? 'th' : 'td');
 
-         $selectedProject = $category_id != 0 ? $DB->request('glpi_plugin_gitlab_projects', ['category_id' => $category_id])->next() : '';
-         $associatedCategories = $DB->request('glpi_plugin_gitlab_projects', ['NOT' => ['category_id' => NULL]]);
-         // GITLAB PROJECT SELECT INPUT
-         $associatedCategoriesIds = [];
-         foreach ($associatedCategories as $associatedCategory) {
-            array_push($associatedCategoriesIds, $associatedCategory['category_id']);
-         }
 
+        
+         $selectedProject = null;
+         if(!empty($category_id)){
+            $result =  $DB->request(['FROM' => 'glpi_plugin_gitlab_projects', 'WHERE' => ['category_id' => $category_id]]);
+            $selectedProject = $result->current();
+
+            $result =  $DB->request('glpi_plugin_gitlab_projects', 
+            ['WHERE' => ['general' => 1]]);
+
+            $defaultProject =  $result->current();
+         }
 
          echo "<tr>";
          echo "<td>";
@@ -78,18 +82,33 @@ class PluginGitlabIntegrationItemForm
          echo "</$firstElt><td>";
 
          echo "<select style='padding: 5px' name='project_id' id='project_id'>";
-         if (!in_array($category_id, $associatedCategoriesIds)) {
-            $defaultProject = $DB->request('glpi_plugin_gitlab_projects', ['general' => 1])->next();
-            echo "<option value='$defaultProject[project_id]'>$defaultProject[project_name]</option>";
-         };
          foreach ($projects as $project) {
-            if ($project->id == $defaultProject['project_id']) continue;
-            echo "<option value='$project->id'";
-            if ($selectedProject['project_id'] == $project->id) echo ' selected';
-            echo ">";
-            echo  $project->name_with_namespace;
-            echo '</option>';
+
+            if(empty($selectedProject['project_id'])){
+
+               if ($defaultProject['project_id'] == $project->id)
+               {
+                  echo "<option value='$project->id'";
+                  echo ' selected';
+                  echo ">";
+                  echo  $project->name_with_namespace;
+                  echo '</option>';
+               }
+
+            }else{
+               if ($selectedProject['project_id'] == $project->id)
+               {
+                  echo "<option value='$project->id'";
+                  echo ' selected';
+                  echo ">";
+                  echo  $project->name_with_namespace;
+                  echo '</option>';
+               }
+            }
+            
          }
+      
+      
          echo "</select>";
 
          echo "</td>";
