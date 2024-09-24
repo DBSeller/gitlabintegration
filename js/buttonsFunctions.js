@@ -52,18 +52,23 @@ const createIssue = (
         ticketDueDate: ticketDueDate,
         ticketType: ticketType,
         ticketLabel: ticketLabel,
+        method:"create"
       },
     })
     .success((res) => {
-      let data = JSON.parse(res);
-      if (data.res == false) {
-        alert($message);
+
+      if(res.message){
+        alert(res.message);
+      }else{
+        alert("Ocorreu um erro!");
       }
-      if (data.res == true) {
-        location.reload();
-      }
+
+      setTimeout(() =>{window.reload();},5000)
     })
-    .fail(() => false);
+    .fail(() => {
+      alert("Ocorreu um erro!");
+      setTimeout(() =>{window.reload();},5000)
+    });
 };
 
 const setDefault = () => {
