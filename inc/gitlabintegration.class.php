@@ -33,13 +33,18 @@ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
 class PluginGitlabIntegrationGitlabIntegration
 {
 
-    /**
-     * Display contents at create issue of gitlab selected project.
-     *
-     * @param void
-     *
-     * @return void
-     */
+
+        /**
+         * Cria um novo Issue em um projeto do GitLab.
+         *
+         * @param int    $selectedProject ID do projeto no GitLab
+         * @param string $title           Titulo do Issue
+         * @param string $description     Descri o do Issue
+         * @param string $dueDate         Data de vencimento do Issue
+         * @param string $type            Tipo do Issue
+         * @param string $label           R tulo do Issue
+         * @return mixed
+         */
     static public function CreateIssue($selectedProject, $title, $description, $dueDate, $type, $label)
     {
         $parameters = PluginGitlabIntegrationParameters::getParameters();
@@ -63,10 +68,11 @@ class PluginGitlabIntegrationGitlabIntegration
         );
  
         // create an issue
-        self::apiPost($query, $url, $headers);
+        $response =  self::apiPost($query, $url, $headers);
 
         $logIssue = "[ISSUE CREATED: IID: $iid, PROJECT ID: $selectedProject, TITLE: ' $title ', DESCRIPTION: ' $description ']";
         PluginGitlabIntegrationEventLog::CreatedIssueLog($logIssue);
+        return $response;
     }
 
     static public function apiPost($query, $url, $headers)
@@ -83,9 +89,11 @@ class PluginGitlabIntegrationGitlabIntegration
 
             curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
 
-            curl_exec($curl);
+            $content  = curl_exec($curl);
     
             curl_close($curl);
+
+            return $content;
         } catch (Exception $e) {
             PluginGitlabIntegrationEventLog::ErrorLog($e->getMessage());
         }

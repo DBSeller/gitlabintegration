@@ -63,11 +63,11 @@ const createIssue = (
         alert("Ocorreu um erro!");
       }
 
-      setTimeout(() =>{window.reload();},5000)
+      setTimeout(() =>{window.location.reload();},5000)
     })
     .fail(() => {
       alert("Ocorreu um erro!");
-      setTimeout(() =>{window.reload();},5000)
+      setTimeout(() =>{window.location.reload();},5000)
     });
 };
 

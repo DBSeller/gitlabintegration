@@ -68,6 +68,8 @@ class GitLabIssue{
                     'gitlab_member_id' => $_SESSION["glpiID"]
                 ]
             );
+
+        
     
             $title = "GLPI - ".$this->request->ticketId . ' / ' . $this->request->ticketName;
             $description = str_replace('&lt;p&gt;', '', str_replace('&lt;/p&gt;', '', $this->request->ticketContent));
@@ -78,8 +80,41 @@ class GitLabIssue{
             $dueDate = $this->request->ticketDueDate;
             $type =  $this->request->ticketType;
             $label =  $this->request->ticketLabel;
+
+
     
-            PluginGitlabIntegrationGitlabIntegration::CreateIssue($this->request->selectedProject, $title, $description, $dueDate, $type, $label);
+            $response = PluginGitlabIntegrationGitlabIntegration::CreateIssue(
+                $this->request->selectedProject, 
+                $title, 
+                $description, 
+                $dueDate, 
+                $type, 
+                $label
+            );
+
+            $issue = json_decode($response);
+
+            $content = 'Criando Issue no gitlab para verificação <a href="'.$issue->web_url.'" target="blank">#'.$issue->iid.'</a>';
+
+            $insertData =   [
+                'items_id'         => $this->request->ticketId,
+                'itemtype' => 'Ticket',
+                'date' => date('Y-m-d H:i:s'),
+                'users_id' => $_SESSION["glpiID"],
+                'is_private' => 1,
+                'requesttypes_id' => 1,
+                'date_mod' => date('Y-m-d H:i:s'),
+                'date_creation' => date('Y-m-d H:i:s'),
+                'timeline_position' => 4,
+                'sourceitems_id' => 0,
+                'sourceof_items_id' => 0,
+                'content' => $content
+            ];
+
+            $DB->insert(
+                'glpi_itilfollowups',
+                $insertData
+            );
 
             $DB->commit();
 
